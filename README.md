@@ -1,2 +1,2 @@
 # SDGW_CP-ABE-SSE
-CP-ABE+SSE
+山东国网 CP-ABE+SSE
