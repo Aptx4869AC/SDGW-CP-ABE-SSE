@@ -8,8 +8,7 @@ using namespace INDEXSPACE;
 
 #define PORT 8080
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
     const char *openssl_version = OpenSSL_version(OPENSSL_VERSION);
     // cout << "OpenSSL Version: " << openssl_version << std::endl;
 
@@ -54,6 +53,27 @@ int main(int argc, char *argv[])
     BIO_dump_fp(stdout, (const char *) cipher_word.content, cipher_word.len);
     BIO_dump_fp(stdout, (const char *) cipher_word.tag, 16);
 
+
+//    begin = std::chrono::high_resolution_clock::now();
+//    unsigned char decrypted_word_tmp[128];
+//    int decrypted_word_len_tmp = gcm_decrypt(cipher_word.content, cipher_word.len,
+//                                             nullptr, 0,
+//                                             cipher_word.tag,
+//                                             sk_3,
+//                                             iv, strlen((char *) iv),
+//                                             decrypted_word_tmp);
+//    if (decrypted_word_len_tmp >= 0) {
+//        decrypted_word_tmp[decrypted_word_len_tmp] = '\0';
+//        cout << decrypted_word_tmp << "\n";
+//    } else {
+//        printf("Decryption num failed\n");
+//        exit(-1);
+//    }
+//    end = std::chrono::high_resolution_clock::now();
+//    elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
+//    printf("\ntime of decryption (ms):\t %.3f\n\n", elapsed.count() * 1e-6);
+
+
     int server_socket;
     struct sockaddr_in serverAddr;
 
@@ -66,15 +86,13 @@ int main(int argc, char *argv[])
 
     if (connect(server_socket, (struct sockaddr *) &serverAddr, sizeof(serverAddr)) == 0)
         std::cout << "Connected to server" << std::endl;
-    else
-    {
+    else {
         std::cout << "Failed to connect to server" << std::endl;
         return -1;
     }
 
-    int n = 1;
-    for (int epoch = 0; epoch < n; epoch++)
-    {
+    int n = 5;
+    for (int epoch = 0; epoch < n; epoch++) {
         write(server_socket, &(cipher_word.len), sizeof(int) * 1);
         write(server_socket, cipher_word.content, sizeof(unsigned char) * 128);
         write(server_socket, cipher_word.tag, sizeof(unsigned char) * 16);
@@ -85,8 +103,7 @@ int main(int argc, char *argv[])
         size_t byte_stream_size_keyword = 0;
         read(server_socket, &byte_stream_size_keyword, sizeof(size_t));
         printf("The count of keywords that need to receive: %ld\n", byte_stream_size_keyword);
-        for (size_t i = 0; i < byte_stream_size_keyword; i++)
-        {
+        for (size_t i = 0; i < byte_stream_size_keyword; i++) {
             /* accept result EncK0(keyword) */
             int distance;
             struct cipher_keyword received_cipher_word;
@@ -107,11 +124,9 @@ int main(int argc, char *argv[])
                                                  sk_3,
                                                  iv, strlen((char *) iv),
                                                  decrypted_word);
-            if (decrypted_word_len >= 0)
-            {
+            if (decrypted_word_len >= 0) {
                 decrypted_word[decrypted_word_len] = '\0';
-            } else
-            {
+            } else {
                 printf("Decryption num failed\n");
                 exit(-1);
             }
@@ -123,8 +138,7 @@ int main(int argc, char *argv[])
 
             /* accept result EncK0(index) */
             vector <cipher_number> vec_num;
-            for (size_t i = 0; i < byte_stream_size_index / sizeof(cipher_number); i++)
-            {
+            for (size_t i = 0; i < byte_stream_size_index / sizeof(cipher_number); i++) {
                 cipher_number num;
                 read(server_socket, &num.len, sizeof(int) * 1);
                 num.content = new unsigned char[128];
@@ -136,8 +150,7 @@ int main(int argc, char *argv[])
             cout << "[Client] accept result EncK3(index)\n\n";
 
             if (strcmp(reinterpret_cast<const char *>(decrypted_word), reinterpret_cast<const char *>(plain_word)) !=
-                0)
-            {
+                0) {
                 cout << "Enclave has internally corrected keyword\n";
                 cout << "request: " << plain_word << '\n';
                 cout << "return(Has been decrypted by Client): " << decrypted_word << '\n';
@@ -146,8 +159,7 @@ int main(int argc, char *argv[])
 
             /* decrypted */
             printf("distance:%d, %s: [ ", distance, decrypted_word);
-            for (auto num: vec_num)
-            {
+            for (auto num: vec_num) {
 
                 unsigned char decrypted_num[128];
                 int decrypted_num_len = gcm_decrypt(num.content, num.len,
@@ -156,12 +168,10 @@ int main(int argc, char *argv[])
                                                     sk_3,
                                                     iv, strlen((char *) iv),
                                                     decrypted_num);
-                if (decrypted_num_len >= 0)
-                {
+                if (decrypted_num_len >= 0) {
                     decrypted_num[decrypted_num_len] = '\0';
                     cout << decrypted_num << " ";
-                } else
-                {
+                } else {
                     printf("Decryption num failed\n");
                     exit(-1);
                 }
