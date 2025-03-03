@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # SDGW_CP-ABE-SSE
 
 ### (CP-ABE)
@@ -21,3 +22,6 @@ cd Server && make
 cd Client && make
 ./client [keyword] # Open a new terminal, where keyword can be any word in the text file
 ```
+=======
+# SDGWP-CP-ABE-SS
+~                        
