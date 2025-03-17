@@ -1,0 +1,29 @@
+enclave {
+    from "sgx_tsgxssl.edl" import *;
+    from "sgx_pthread.edl" import *;
+    struct cipherKeyword {
+        unsigned char *content;
+        unsigned char *tag;
+        int len;
+
+    };
+
+
+    untrusted {
+        void ocall_print_string([in, string] const char *str);
+        void ocall_print_openssl([in, string] const char* str, int len);
+    };
+
+    trusted {
+        public void fetch_table([in] cipherKeyword  table[10000], int tableSize);
+        public void step_1(cipherKeyword word, [in,out] size_t **location, [in,out] size_t *location_len, [in,out] size_t **distance_vtr);
+        public void step_3(cipherKeyword response_word,
+                           [in] unsigned char** response_cipher_vector, [in] size_t* response_cipher_vector_len,
+                           [in] unsigned char** response_tag_vector, [in] size_t* response_tag_vector_len,
+                           [in,out] cipherKeyword *result_word,
+                           [in,out] unsigned char** result_cipher_vector, [in,out] size_t* result_len_vector,
+                           [in,out] unsigned char** result_tag_vector, [in,out] size_t* result_tag_vector_len);
+
+    };
+};
+
