@@ -1,9 +1,0 @@
-Enclave.so
-{
-    global:
-        g_global_data_sim;
-        g_global_data;
-        Enclave_entry;
-    local:
-        *;
-};
